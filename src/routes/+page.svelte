@@ -1,2 +1,6 @@
-<h1 class="text-4xl m-4">Welcome to SvelteKit</h1>
-<p class="m-4">Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<div class="container h-screen mx-auto flex justify-center items-center">
+    <div class="space-y-10 flex flex-col items-center">
+        <h2 class="text-2xl">Welcome to Thor's SvelteKit App!</h2>
+        <button type="button" class="btn preset-filled-primary-500">Login</button>
+    </div>
+</div>

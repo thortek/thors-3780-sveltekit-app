@@ -1,9 +1,9 @@
 import clientPromise from '$lib/mongodb/mongodb.client';
 import type { PageServerLoad } from './$types';
-import type { Movie } from '$lib/types/Movie';
+//import type { Movie } from '$lib/types/Movie';
 
 export const load: PageServerLoad = async () => {
-	let movies: Movie[] | undefined;
+	let movies;
 	let client;
 
 	try {
@@ -26,12 +26,7 @@ export const load: PageServerLoad = async () => {
 				id: movie._id.toString(),
 				title: movie.title,
 				year: movie.year,
-				runtime: movie.runtime,
-				plot: movie.plot,
-				rated: movie.rated,
-				imdb: {
-					rating: movie.imdb.rating
-				}
+				poster: movie.poster
 			};
 		});
 

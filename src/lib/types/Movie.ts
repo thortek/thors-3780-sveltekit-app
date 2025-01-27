@@ -7,5 +7,6 @@ export interface Movie {
     rated: string;
     imdb: {
         rating: number;
-    }
+    },
+    poster: string;
 }

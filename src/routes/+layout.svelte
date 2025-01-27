@@ -4,7 +4,7 @@
 
 	const { data, children } = $props<{ data: PageData, children: any }>();
 
-	//let { children } = $props();
+	console.log(data)
 </script>
 
 {@render children()}

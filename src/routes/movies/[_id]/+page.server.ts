@@ -1,25 +1,28 @@
 import clientPromise from '$lib/mongodb/mongodb.client';
 import { ObjectId } from 'mongodb';
 import type { PageServerLoad } from './$types';
+import type { Movie } from '$lib/types/Movie';
 
 
 export const load: PageServerLoad = async ({ params }) => {
     console.log('params: ', params)
 
-    let client, movie
+    let client
+    let movie: Movie | undefined
 
     try {
         client = await clientPromise
         const movieDb = client?.db('sample_mflix')
         const moviesCollection = movieDb?.collection('movies')
-        movie = await moviesCollection?.findOne({ _id: new ObjectId(params._id) })
-        console.log('movie: ', movie)
+        const foundMovie = await moviesCollection?.findOne({ _id: new ObjectId(params._id) })
+        console.log('foundMovie: ', foundMovie)
 
-        if (movie) {
+        if (foundMovie) {
+            const { _id, ...movieData } = foundMovie
             movie = {
-                title: movie.title,
-                id: movie._id.toString(),
-            }
+                id: _id.toString(),
+                ...movieData
+            } as Movie // Type assertion needed here because the MongoDB document may contain additional fields
         }
     } catch (error) {
         console.error('MongoDB connection error:', error)

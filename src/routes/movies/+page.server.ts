@@ -2,7 +2,8 @@ import clientPromise from '$lib/mongodb/mongodb.client';
 import type { PageServerLoad } from './$types';
 //import type { Movie } from '$lib/types/Movie';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ( { url }) => {
+	console.log('url: ', url);
 	let movies;
 	let client;
 
@@ -14,7 +15,7 @@ export const load: PageServerLoad = async () => {
 		const movieArray = await moviesCollection
 			?.find({
                 $and: [
-				 { year: { $gte: 2015, $lte: 2016 }},
+				 { year: { $gte: 2000, $lte: 2016 }},
                  { 'imdb.rating': { $gte: 7 }},
                  {$or: [{ rated: 'PG' }, { rated: 'G' }]}
             ]

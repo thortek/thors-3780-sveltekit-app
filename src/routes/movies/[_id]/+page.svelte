@@ -1,9 +1,13 @@
 <script lang="ts">
-    import type { Movie } from '$lib/types/Movie.ts';
+	import type { Movie } from '$lib/types/Movie.ts';
+	import MovieCard from '$lib/components/MovieCard.svelte';
 
-    let { data }: { data: Movie } = $props();
+	let { data } = $props<{ data: { body: Movie } }>();
+	let movie = data.body;
 
-    console.log(data);
+	console.log(data);
 </script>
 
-<h1>Movie Details: {data.body.title}</h1>
+<main class="min-h-screen flex items-center justify-center bg-primary-50-950">
+	<MovieCard {movie} />
+</main>

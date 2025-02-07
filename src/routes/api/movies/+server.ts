@@ -1,10 +1,12 @@
+import type { RequestHandler } from './$types';
+import { json } from '@sveltejs/kit';
 import clientPromise from '$lib/mongodb/mongodb.client';
-import type { PageServerLoad } from './$types';
-//import type { Movie } from '$lib/types/Movie';
 
-export const load: PageServerLoad = async ( { url }) => {
-	console.log('url: ', url);
-	let movies;
+export const POST = async ({ request }) => {
+    const body = await request.json();
+    console.log('body: ', body);
+
+ 	let movies;
 	let client;
 
 	try {
@@ -35,13 +37,8 @@ export const load: PageServerLoad = async ( { url }) => {
 	} catch (error) {
 		console.error('MongoDB connection error:', error);
 		if (client) await client.close(); // if error, close the connection
-		return {
-			status: 500,
-			message: 'MongoDB connection error'
-		};
-	}
-	return {
-		status: 200,
-		body: movies
-	};
-};
+		return json({ error: 'Internal Server Error' }, { status: 500 });
+	} 
+    return json(movies, { status: 200 });
+
+}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Movie } from '$lib/types/Movie.ts';
+	import type { Movie } from '$lib/types/MovieType';
 	import MovieCard from '$lib/components/MovieCard.svelte';
 
 	let { data } = $props<{ data: { body: Movie } }>();

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Movie } from '$lib/types/Movie.ts';
+    import type { Movie } from '$lib/types/MovieType';
 
     let { movie } = $props<{ movie: Movie }>();
   

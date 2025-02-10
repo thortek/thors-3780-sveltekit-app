@@ -1,7 +1,7 @@
 import clientPromise from '$lib/mongodb/mongodb.client';
 import { ObjectId } from 'mongodb';
 import type { PageServerLoad } from './$types';
-import type { Movie } from '$lib/types/Movie';
+import type { Movie } from '$lib/types/MovieType';
 
 
 export const load: PageServerLoad = async ({ params }) => {

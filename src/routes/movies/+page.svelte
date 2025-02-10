@@ -1,108 +1,145 @@
 <script lang="ts">
-	import { fade, fly } from 'svelte/transition';
-	import { Slider, Switch } from '@skeletonlabs/skeleton-svelte';
+	import { Slider } from '@skeletonlabs/skeleton-svelte';
+	import type { MovieType } from '$lib/types/MovieType';
+	import Movie from '$lib/components/Movie.svelte';
 
-  
-	// State using proper Svelte 5 runes syntax
-	let yearRange = $state([1970, 2024]);
-	let selectedRatings = $state(new Set<string>());
-	let scoreRange = $state([0, 10]);
-  
+	let movies = [] as MovieType[];
+	let totalMovies = 0;
+
+	// Simple object to track ratings
+	let selectedRatings: Record<string, boolean> = {
+		G: false,
+		PG: false,
+		'PG-13': false,
+		R: false
+	};
+
+	let yearRange = [1900, 2016];
+	let scoreRange = [0, 10];
+
 	// Constants
-	const minYear = 1920;
-	const maxYear = 2024;
-	const ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
-  
-	// Effect for logging state changes
-	$effect(() => {
-	  console.log({
-		yearRange,
-		selectedRatings: Array.from(selectedRatings),
-		scoreRange
-	  });
-	});
-  
+	const minYear = 1900;
+	const maxYear = 2016;
+
+	function constructUrl(movieId: string) {
+        return `/movies/${movieId}`;
+    }
+
 	// Handle rating selection
-	function toggleRating(rating: string) {
-	  if (selectedRatings.has(rating)) {
-		selectedRatings.delete(rating);
-	  } else {
-		selectedRatings.add(rating);
-	  }
+	function handleRatingChange(rating: string, checked: boolean) {
+		selectedRatings[rating] = checked;
+		console.log({
+			yearRange: [...yearRange],
+			selectedRatings: { ...selectedRatings },
+			scoreRange: [...scoreRange]
+		});
 	}
 
-	function handleCheckedChange(event: CustomEvent<boolean>) {
-		console.log(event.detail);
+	async function handleSearch() {
+		try {
+			const searchCriteria = {
+				yearRange,
+				selectedRatings: Object.entries(selectedRatings)
+					.filter(([_, isSelected]) => isSelected)
+					.map(([rating]) => rating),
+				scoreRange
+			};
+
+			// Make API call to search for movies
+			const response = await fetch('/api/movies', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(searchCriteria)
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to search for movies');
+			}
+			const data = await response.json();
+			console.log('Search results: ', data);
+			movies = data.movies;
+		} catch (error) {
+			console.error('Search error: ', error);
+		}
 	}
-  </script>
-  
-  <div class="min-h-screen bg-gradient-to-br from-surface-900 via-tertiary-400 to-primary-900">
-	<div class="container mx-auto px-4 py-12">
-	  <div class="card">
-		<header class="text-center mb-8">
-		  <h1 class="h1 font-bold bg-gradient-to-r from-primary-200 to-tertiary-200 rounded-lg p-2">
-			🎬 Movie Discovery
-		  </h1>
-		</header>
-  
-		<!-- Year Range Section -->
-		<section class="mb-12" in:fly={{ y: 20, delay: 150 }}>
-		  <h2 class="h2 mb-4">Release Year Range</h2>
-		  <div class="px-4">
-			<div class="flex justify-between mb-2">
-			  <span class="text-surface-200">{yearRange[0]}</span>
-			  <span class="text-surface-200">{yearRange[1]}</span>
+</script>
+
+<div class="min-h-screen bg-gradient-to-br from-surface-900 via-tertiary-800 to-primary-900">
+	<div class="container mx-auto px-4 py-2">
+		<div class="card">
+			<header class="mb-2 text-center">
+				<h5 class="h5 rounded-lg bg-gradient-to-r from-primary-200 to-tertiary-200">
+					🎬 Movie Discovery
+				</h5>
+			</header>
+
+			<!-- Year Range Section -->
+			<section class="flex">
+				<h5 class="h5 mb-2 pt-2 text-secondary-50">Release Year Range</h5>
+				<div class="grow px-4">
+					<div class="mb-2 flex justify-between font-bold">
+						<span class="text-surface-200">{yearRange[0]}</span>
+						<span class="text-surface-200">{yearRange[1]}</span>
+					</div>
+					<Slider bind:value={yearRange} min={minYear} max={maxYear} step={1} />
+				</div>
+			</section>
+
+			<!-- Ratings Section -->
+			<section class="flex flex-col md:flex-row">
+				<h5 class="h5 mr-4 text-secondary-50">Ratings</h5>
+				<div class="flex flex-wrap gap-4 font-bold">
+					{#each Object.entries(selectedRatings) as [rating, checked]}
+						<label class="flex cursor-pointer items-center space-x-2">
+							<input
+								type="checkbox"
+								name="rating-{rating}"
+								{checked}
+								onchange={(e) => handleRatingChange(rating, e.currentTarget.checked)}
+								class="checkbox"
+							/>
+							<span class="text-surface-200">{rating}</span>
+						</label>
+					{/each}
+				</div>
+			</section>
+
+			<!-- Critic Score Section -->
+			<section class="mb-2 flex grow">
+				<h5 class="h5 mb-4 text-secondary-50">Critic Range</h5>
+				<div class="grow px-4">
+					<div class="mb-2 flex justify-between font-bold">
+						<span class="text-surface-200">{scoreRange[0]}</span>
+						<span class="text-surface-200">{scoreRange[1]}</span>
+					</div>
+					<Slider bind:value={scoreRange} min={0} max={10} step={1} />
+				</div>
+			</section>
+
+			<!-- Search Button -->
+			<div class="text-center">
+				<button
+					type="button"
+					class="btn rounded-full bg-primary-50 font-semibold preset-filled"
+					onclick={handleSearch}
+				>
+					Find Movies 🍿
+				</button>
 			</div>
-			<Slider
-			  bind:value={yearRange}
-			  min={minYear}
-			  max={maxYear}
-			  step={1}
-			/>
-		  </div>
-		</section>
-  
-		<!-- Ratings Section -->
-		<section class="mb-12" in:fly={{ y: 20, delay: 300 }}>
-		  <h2 class="h2 mb-4">Movie Ratings</h2>
-		  <div class="flex flex-wrap gap-4">
-			{#each ratings as rating}
-			<Switch name="ratingSwitch">
-				{rating}
-			</Switch>
-<!-- 			  <button color={selectedRatings.has(rating) ? 'tertiary' : 'surface'}
-				onclick={() => toggleRating(rating)}
-			  >
-				{rating}
-			  </button> -->
+		</div>
+	</div>
+	<hr />
+	<div class="container mx-auto p-2">
+		<div class="flex flex-wrap">
+
+			{#each movies as movie}
+			<a href={constructUrl(movie.id)}>
+				<Movie {...movie} />
+			</a>
 			{/each}
-		  </div>
-		</section>
-  
-		<!-- Critic Score Section -->
-		<section class="mb-12" in:fly={{ y: 20, delay: 450 }}>
-		  <h2 class="h2 mb-4">Critic Score Range</h2>
-		  <div class="px-4">
-			<div class="flex justify-between mb-2">
-			  <span class="text-surface-200">{scoreRange[0]}%</span>
-			  <span class="text-surface-200">{scoreRange[1]}%</span>
-			</div>
-			<Slider
-			  bind:value={scoreRange}
-			  min={0}
-			  max={100}
-			  step={1}
-			/>
-		  </div>
-		</section>
-  
-		<!-- Search Button -->
-		<div class="text-center" in:fly={{ y: 20, delay: 600 }}>
-		  <div class="btn preset-filled bg-primary-50 rounded-full font-semibold"
-		  >
-			Find Movies 🍿
-		</div>
+
 		</div>
 	</div>
-	</div>
-  </div>
+</div>

@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
-import clientPromise from '$lib/mongodb/mongodb.client';
+import { initMongoDB } from '$lib/mongodb/mongodb.client';
 
 export const POST = async ({ request }) => {
     const body = await request.json();
@@ -10,16 +10,18 @@ export const POST = async ({ request }) => {
 	let client;
 
 	try {
-		client = await clientPromise;
+		client = await initMongoDB();
+		
 		const movieDb = client?.db('sample_mflix');
+		
 		const moviesCollection = movieDb?.collection('movies');
 
 		const movieArray = await moviesCollection
 			?.find({
                 $and: [
-				 { year: { $gte: 2000, $lte: 2016 }},
-                 { 'imdb.rating': { $gte: 7 }},
-                 {$or: [{ rated: 'PG' }, { rated: 'G' }]}
+				 { year: { $gte: 1976, $lte: 1978 }},
+                 { 'imdb.rating': { $gte: 8 }},
+                 {$or: [{ rated: 'PG' }]}
             ]
 			})
 			.toArray();

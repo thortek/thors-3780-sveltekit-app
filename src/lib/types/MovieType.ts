@@ -1,4 +1,4 @@
-export interface Movie {
+export interface MovieType {
 	id: string;
 	plot: string;
 	genres: string[];

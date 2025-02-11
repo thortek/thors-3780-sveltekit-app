@@ -1,8 +1,10 @@
-import clientPromise from '$lib/mongodb/mongodb.client';
+import { initMongoDB } from '$lib/mongodb/mongodb.client';
 import type { PageServerLoad } from './$types';
 
+let client
+
 export const load: PageServerLoad = async ({ params }) => {
-	const client = await clientPromise;
+	client = await initMongoDB();
 	try {
 		await client?.db('sample_airbnb').command({ ping: 1 });
 		console.log('Pinged my MongoDB database.  It worked!');

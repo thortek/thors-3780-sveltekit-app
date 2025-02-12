@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { Movie } from '$lib/types/MovieType';
+    import type { MovieType } from '$lib/types/MovieType';
 
-    let { movie } = $props<{ movie: Movie }>();
+    let { movie } = $props<{ movie: MovieType }>();
   
     // Calculate star rating
     const stars = Array.from({ length: 5 }, (_, i) => i < Math.round(movie.rating));

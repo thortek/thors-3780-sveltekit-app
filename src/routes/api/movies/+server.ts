@@ -2,9 +2,26 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { initMongoDB } from '$lib/mongodb/mongodb.client';
 
+async function validateImageUrl(url: string): Promise<string | null> {
+	try {
+		const response = await fetch(url, { method: 'HEAD'})
+		if (response.ok) {
+			return url
+		} else {
+			return `/defaultMoviePoster.png`
+		}
+	} catch (error) {
+		console.error('Error validating image URL:', error);
+		return `/defaultMoviePoster.png`
+	}
+}
+
 export const POST = async ({ request }) => {
-    const body = await request.json();
-    console.log('body: ', body);
+    const {
+		yearRange: [startYear, endYear],
+		selectedRatings,
+		scoreRange: [minScore, maxScore]
+	} = await request.json();
 
  	let movies;
 	let client;
@@ -19,21 +36,21 @@ export const POST = async ({ request }) => {
 		const movieArray = await moviesCollection
 			?.find({
                 $and: [
-				 { year: { $gte: 1976, $lte: 1978 }},
-                 { 'imdb.rating': { $gte: 8 }},
-                 {$or: [{ rated: 'PG' }]}
-            ]
+				 { year: { $gte: startYear, $lte: endYear }},
+                 { 'imdb.rating': { $gte: minScore, $lte: maxScore }},
+                 { rated: { $in: selectedRatings }}]
+            
 			})
 			.toArray();
 
-		movies = movieArray?.map((movie) => {
-			return {
+		movies = await Promise.all(
+		(movieArray ?? []).map(async (movie) => ({
 				id: movie._id.toString(),
 				title: movie.title,
 				year: movie.year,
-				poster: movie.poster
-			};
-		});
+				poster: await validateImageUrl(movie.poster)
+			}))
+		)
 
 		//console.log('Movies: ', movies)
 	} catch (error) {

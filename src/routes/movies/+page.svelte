@@ -2,28 +2,46 @@
 	import { Slider } from '@skeletonlabs/skeleton-svelte';
 	import type { MovieType } from '$lib/types/MovieType';
 	import Movie from '$lib/components/Movie.svelte';
+	import { browser } from '$app/environment';
 
-	let movies = [] as MovieType[];
-	let totalMovies = 0;
+	console.log('Browser:', browser);
+	//console.log(localStorage);
 
-	// Simple object to track ratings
-	let selectedRatings: Record<string, boolean> = {
-		G: false,
-		PG: false,
-		'PG-13': false,
-		R: false
-	};
+	let movies = $state<MovieType[]>(
+		browser ? JSON.parse(localStorage.getItem('movies') || '[]') : []
+	);
+	let totalMovies = $state(0)
+	let selectedRatings = $state<Record<string, boolean>>(
+		browser
+			? JSON.parse(localStorage.getItem('selectedRatings') || '{"G": false, "PG": false, "PG-13": false, "R": false}')
+			: { G: false, PG: false, 'PG-13': false, R: false }
+	);
 
-	let yearRange = [1900, 2016];
-	let scoreRange = [0, 10];
+	let yearRange = $state<[number, number]>(
+		browser ? JSON.parse(localStorage.getItem('yearRange') || '[1900, 2016]') : [1900, 2016]
+	);
+
+	let scoreRange = $state<[number, number]>(
+        browser
+            ? JSON.parse(localStorage.getItem('scoreRange') || '[0, 10]')
+            : [0, 10]
+    );
+	
 
 	// Constants
 	const minYear = 1900;
 	const maxYear = 2016;
+ 
+	$effect(() => {
+		localStorage.setItem('movies', JSON.stringify(movies));
+		localStorage.setItem('selectedRatings', JSON.stringify(selectedRatings));
+		localStorage.setItem('yearRange', JSON.stringify(yearRange));
+		localStorage.setItem('scoreRange', JSON.stringify(scoreRange));
+	});
 
 	function constructUrl(movieId: string) {
-        return `/movies/${movieId}`;
-    }
+		return `/movies/${movieId}`;
+	}
 
 	// Handle rating selection
 	function handleRatingChange(rating: string, checked: boolean) {
@@ -59,7 +77,7 @@
 			}
 			const data = await response.json();
 			console.log('Search results: ', data);
-			movies = data.movies;
+			movies = data;
 		} catch (error) {
 			console.error('Search error: ', error);
 		}
@@ -133,13 +151,11 @@
 	<hr />
 	<div class="container mx-auto p-2">
 		<div class="flex flex-wrap">
-
 			{#each movies as movie}
-			<a href={constructUrl(movie.id)}>
-				<Movie {...movie} />
-			</a>
+				<a href={constructUrl(movie.id)}>
+					<Movie {...movie} />
+				</a>
 			{/each}
-
 		</div>
 	</div>
 </div>

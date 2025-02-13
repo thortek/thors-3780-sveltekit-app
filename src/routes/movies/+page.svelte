@@ -33,10 +33,12 @@
 	const maxYear = 2016;
  
 	$effect(() => {
+		if (browser) {
 		localStorage.setItem('movies', JSON.stringify(movies));
 		localStorage.setItem('selectedRatings', JSON.stringify(selectedRatings));
 		localStorage.setItem('yearRange', JSON.stringify(yearRange));
 		localStorage.setItem('scoreRange', JSON.stringify(scoreRange));
+		}
 	});
 
 	function constructUrl(movieId: string) {

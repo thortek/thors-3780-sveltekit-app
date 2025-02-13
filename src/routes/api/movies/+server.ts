@@ -2,18 +2,23 @@ import type { RequestHandler } from './$types';
 import { json } from '@sveltejs/kit';
 import { initMongoDB } from '$lib/mongodb/mongodb.client';
 
-async function validateImageUrl(url: string): Promise<string | null> {
-	try {
-		const response = await fetch(url, { method: 'HEAD'})
-		if (response.ok) {
-			return url
-		} else {
-			return `/defaultMoviePoster.png`
-		}
-	} catch (error) {
-		console.error('Error validating image URL:', error);
-		return `/defaultMoviePoster.png`
-	}
+async function validateImageUrl(url: string | null | undefined): Promise<string> {
+    // Return default image if url is falsy
+    if (!url) {
+        return '/defaultMoviePoster.png';
+    }
+
+    try {
+        const response = await fetch(url, { method: 'HEAD' });
+        if (response.ok) {
+            return url;
+        } else {
+            return '/defaultMoviePoster.png';
+        }
+    } catch (error) {
+        console.error('Error validating image URL:', error);
+        return '/defaultMoviePoster.png';
+    }
 }
 
 export const POST = async ({ request }) => {

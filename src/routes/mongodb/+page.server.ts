@@ -1,10 +1,16 @@
-import { initMongoDB } from '$lib/mongodb/mongodb.client';
 import type { PageServerLoad } from './$types';
+import { redirect } from '@sveltejs/kit';
 
 let client
 
-export const load: PageServerLoad = async ({ params }) => {
-	client = await initMongoDB();
+export const load: PageServerLoad = async ({ parent, locals }) => {
+
+	const { isAuthenticated } = await parent();
+         if (!isAuthenticated) {
+        throw redirect(302, '/');
+    }
+
+	const client = locals.mongoClient;
 	try {
 		await client?.db('sample_airbnb').command({ ping: 1 });
 		console.log('Pinged my MongoDB database.  It worked!');

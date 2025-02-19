@@ -2,6 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit'
 import { kindeAuthClient, type SessionManager } from '@kinde-oss/kinde-auth-sveltekit'
 
 export async function load({ request }: RequestEvent) {
+    
     let isAuthenticated = false
     let userProfile = null
 

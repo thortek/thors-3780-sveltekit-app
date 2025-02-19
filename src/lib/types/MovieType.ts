@@ -1,4 +1,7 @@
+import type { ObjectId } from 'mongodb';
+
 export interface MovieType {
+	_id: ObjectId;
 	id: string;
 	plot: string;
 	genres: string[];

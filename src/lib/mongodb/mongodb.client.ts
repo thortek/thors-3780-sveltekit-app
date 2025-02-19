@@ -16,9 +16,9 @@ const client = new MongoClient(mongoURI, {
 
 let clientPromise: Promise<MongoClient> | null = null;
 
-export const initMongoDB = async () => {
+export const initMongoDB = async (): Promise<MongoClient> => {
   if (!clientPromise) {
     clientPromise = client.connect();
   }
-  return await clientPromise;
+  return clientPromise;
 };

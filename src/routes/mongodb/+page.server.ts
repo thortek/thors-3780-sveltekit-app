@@ -20,8 +20,6 @@ export const load: PageServerLoad = async ({ parent, locals }) => {
 			status: 500,
 			message: 'MongoDB connection error'
 		};
-	} finally {
-		await client?.close();
 	}
 
 	return {

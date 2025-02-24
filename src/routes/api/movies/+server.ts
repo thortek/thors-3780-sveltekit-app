@@ -1,7 +1,7 @@
 import type { MovieType } from '$lib/types/MovieType'
 import { json } from '@sveltejs/kit'
 
-async function validateImageUrl(url: string | null | undefined): Promise<string> {
+async function validateImageUrl(url: string): Promise<string | null> {
 	// Return default image if url is falsy
 	if (!url) {
 		return '/defaultMoviePoster.png'

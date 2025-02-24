@@ -32,7 +32,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         const movieDb = client?.db('sample_mflix')
         const moviesCollection = movieDb?.collection('movies')
         const foundMovie = await moviesCollection?.findOne({ _id: new ObjectId(params._id) })
-        console.log('foundMovie: ', foundMovie)
+       // console.log('foundMovie: ', foundMovie)
 
         if (foundMovie) {
             const { _id, poster, ...movieData } = foundMovie

@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { MovieType } from '$lib/types/MovieType';
+    import { Rating } from '@skeletonlabs/skeleton-svelte';
 
     let { movie } = $props<{ movie: MovieType }>();
   
@@ -14,7 +15,7 @@
         <img
           src={movie.poster || "/placeholder.svg"}
           alt="{movie.title} poster"
-          class="w-full h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+          class="w-full h-full object-cover rounded-lg"
         />
       </div>
   
@@ -26,32 +27,23 @@
             {movie.title} <span class="text-gray-500 dark:text-gray-400">({movie.year})</span>
           </h2>
           <p class="text-sm text-gray-500 dark:text-gray-400">
-            Directed by <span class="font-semibold">{movie.director}</span>
+            Directed by <span class="font-semibold">{movie.directors.join(',')}</span>
           </p>
         </div>
   
         <!-- Rating -->
         <div class="flex items-center gap-4">
           <div class="flex gap-1">
-            {#each stars as star}
-              <svg
-                class="w-5 h-5 {star ? "text-yellow-400" : "text-gray-300 dark:text-gray-600"}"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" />
-              </svg>
-            {/each}
+            <Rating bind:value={movie.imdb.rating} allowHalf readOnly></Rating>
           </div>
-          <span class="text-sm font-medium">{movie.rating}/5</span>
+          <span class="text-sm font-medium">{movie?.imdb?.rating}</span>
           <span class="text-sm text-gray-500 dark:text-gray-400">({movie.reviews} reviews)</span>
         </div>
   
         <!-- Metadata -->
         <div class="flex gap-4 text-sm">
           <span class="px-2.5 py-0.5 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-100">
-            {movie.runtime}
+            {movie.runtime} minutes
           </span>
           {#each movie.genre as g}
             <span class="px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100">
@@ -79,10 +71,8 @@
   
         <!-- Actions -->
         <div class="flex gap-4 mt-auto">
-          <button class="btn">
-            Watch Now
-          </button>
-          <button class="btn variant-soft">
+          <span class="text-sm font-medium">{movie.genres.join(', ')}</span>
+          <button class="btn preset-outlined-primary-50-950" type="button">
             Add to Watchlist
           </button>
         </div>

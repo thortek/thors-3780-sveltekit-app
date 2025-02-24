@@ -1,58 +1,65 @@
 <script lang="ts">
-	import { Slider } from '@skeletonlabs/skeleton-svelte';
-	import type { MovieType } from '$lib/types/MovieType';
-	import Movie from '$lib/components/Movie.svelte';
-	import { browser } from '$app/environment';
-
-	console.log('Browser:', browser);
-	//console.log(localStorage);
+	import { Slider, Pagination } from '@skeletonlabs/skeleton-svelte'
+	import type { MovieType } from '$lib/types/MovieType'
+	import Movie from '$lib/components/Movie.svelte'
+	import { browser } from '$app/environment'
 
 	let movies = $state<MovieType[]>(
 		browser ? JSON.parse(localStorage.getItem('movies') || '[]') : []
-	);
-	let totalMovies = $state(0)
+	)
+
 	let selectedRatings = $state<Record<string, boolean>>(
 		browser
-			? JSON.parse(localStorage.getItem('selectedRatings') || '{"G": false, "PG": false, "PG-13": false, "R": false}')
+			? JSON.parse(
+					localStorage.getItem('selectedRatings') ||
+						'{"G": false, "PG": false, "PG-13": false, "R": false}'
+				)
 			: { G: false, PG: false, 'PG-13': false, R: false }
-	);
+	)
 
 	let yearRange = $state<[number, number]>(
 		browser ? JSON.parse(localStorage.getItem('yearRange') || '[1900, 2016]') : [1900, 2016]
-	);
+	)
 
 	let scoreRange = $state<[number, number]>(
-        browser
-            ? JSON.parse(localStorage.getItem('scoreRange') || '[0, 10]')
-            : [0, 10]
-    );
-	
+		browser ? JSON.parse(localStorage.getItem('scoreRange') || '[0, 10]') : [0, 10]
+	)
 
 	// Constants
-	const minYear = 1900;
-	const maxYear = 2016;
- 
+	const minYear = 1900
+	const maxYear = 2016
+
 	$effect(() => {
 		if (browser) {
-		localStorage.setItem('movies', JSON.stringify(movies));
-		localStorage.setItem('selectedRatings', JSON.stringify(selectedRatings));
-		localStorage.setItem('yearRange', JSON.stringify(yearRange));
-		localStorage.setItem('scoreRange', JSON.stringify(scoreRange));
+			localStorage.setItem('movies', JSON.stringify(movies))
+			localStorage.setItem('selectedRatings', JSON.stringify(selectedRatings))
+			localStorage.setItem('yearRange', JSON.stringify(yearRange))
+			localStorage.setItem('scoreRange', JSON.stringify(scoreRange))
 		}
-	});
+	})
 
 	function constructUrl(movieId: string) {
-		return `/movies/${movieId}`;
+		return `/movies/${movieId}`
 	}
+
+	// Add pagination state
+	let page = $state(0)
+	let pageSize = $state(12) // Number of movie posters per page to show
+	let paginatedMovies = $derived(movies.slice(page * pageSize, (page + 1) * pageSize))
+	let totalPages = $derived(Math.ceil(movies.length / pageSize))
 
 	// Handle rating selection
 	function handleRatingChange(rating: string, checked: boolean) {
-		selectedRatings[rating] = checked;
+		selectedRatings[rating] = checked
 		console.log({
 			yearRange: [...yearRange],
 			selectedRatings: { ...selectedRatings },
 			scoreRange: [...scoreRange]
-		});
+		})
+	}
+
+	function handlePageChange(event: any) {
+		page = event.page
 	}
 
 	async function handleSearch() {
@@ -63,7 +70,7 @@
 					.filter(([_, isSelected]) => isSelected)
 					.map(([rating]) => rating),
 				scoreRange
-			};
+			}
 
 			// Make API call to search for movies
 			const response = await fetch('/api/movies', {
@@ -72,16 +79,16 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify(searchCriteria)
-			});
+			})
 
 			if (!response.ok) {
-				throw new Error('Failed to search for movies');
+				throw new Error('Failed to search for movies')
 			}
-			const data = await response.json();
-			console.log('Search results: ', data);
-			movies = data;
+			const data = await response.json()
+			console.log('Search results: ', data)
+			movies = data
 		} catch (error) {
-			console.error('Search error: ', error);
+			console.error('Search error: ', error)
 		}
 	}
 </script>
@@ -152,12 +159,22 @@
 	</div>
 	<hr />
 	<div class="container mx-auto p-2">
+		<h5 class="h5 text-center text-surface-200">{movies.length} movies found</h5>
 		<div class="flex flex-wrap justify-center">
-			{#each movies as movie}
-				<a href={constructUrl(movie.id)}>
-					<Movie {...movie} />
-				</a>
-			{/each}
+			{#if movies.length > 0}
+				{#each paginatedMovies as movie}
+					<a href={constructUrl(movie.id)}>
+						<Movie {...movie} />
+					</a>
+				{/each}
+			{:else}
+				<p class="text-center text-surface-200">No movies available for selected filters</p>
+			{/if}
 		</div>
+		{#if movies.length > 0}
+			<div class="mb-8 mt-4 flex justify-center">
+				<Pagination data={movies} {page} {pageSize} onPageChange={handlePageChange} siblingCount={5}/>
+			</div>
+		{/if}
 	</div>
 </div>

@@ -15,7 +15,7 @@
   	{#if data.isAuthenticated}
 		<div>
 			<h1>Welcome {data.userProfile?.given_name}!</h1>
-			
+			<a href="/api/auth/logout" class="btn preset-filled-primary-500">Logout</a>
 		</div>
 	{:else}
 		<div class="flex flex-col items-center space-y-10">

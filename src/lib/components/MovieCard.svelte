@@ -8,10 +8,10 @@
     const stars = Array.from({ length: 5 }, (_, i) => i < Math.round(movie.rating));
   </script>
   
-  <div class="card w-full max-w-2xl bg-white dark:bg-gray-800 shadow-xl">
+  <div class="card w-full max-w-2xl bg-primary-100 shadow-xl">
     <div class="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6">
       <!-- Movie Poster -->
-      <div class="relative aspect-[2/3] w-full">
+      <div class="relative aspect-[2/3] w-full m-1">
         <img
           src={movie.poster || "/placeholder.svg"}
           alt="{movie.title} poster"

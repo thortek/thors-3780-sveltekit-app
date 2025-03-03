@@ -43,7 +43,7 @@
 {#if selectedListing && formVisible}
     <form 
         method="POST" 
-        action="?/addReview" 
+        action="?/submitReview" 
         onsubmit={handleSubmit}
         class="p-4 bg-white shadow-lg rounded-lg max-w-2xl mx-auto mt-8"
     >

@@ -1,8 +1,18 @@
 <script lang="ts">
-
-    // Use the props rune
-    const { listings = [] } = $props<{ listings: any }>();
-
+    // Use the props rune with the onSelectListing callback
+    const { 
+        listings = [], 
+        onSelectListing = (listing: any) => {} 
+    } = $props<{ 
+        listings: any[],
+        onSelectListing?: (listing: any) => void 
+    }>();
+    
+    // Function to handle review button click
+    function handleReviewClick(listing: any) {
+        // Call the callback prop directly
+        onSelectListing(listing);
+    }
 </script>
 
 <div class="flex w-full flex-wrap justify-center">
@@ -15,7 +25,12 @@
                     <p class="mt-2 text-gray-600">{listing.summary}</p>
                     <div class="flex justify-between mt-3 items-center">
                         <h4 class="text-xl font-medium text-gray-700">${listing.price}</h4>
-                        <button class="px-3 py-1 bg-gray-800 text-white text-xs font-medium uppercase rounded">Book</button>
+                        <button 
+                            class="px-3 py-1 bg-gray-800 text-white text-xs font-medium uppercase rounded"
+                            onclick={() => handleReviewClick(listing)}
+                        >
+                            Review
+                        </button>
                     </div>
                 </div>
             </div>

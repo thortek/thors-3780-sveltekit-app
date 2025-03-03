@@ -44,3 +44,11 @@ export const load: PageServerLoad = async ({ locals }: RequestEvent) => {
 		};
     }
 }
+
+export const actions = {
+    submitReview: async ({ request, locals }: RequestEvent) => {
+        //const client = locals.mongoClient as MongoClient
+        const data = await request.formData()
+        console.log(data)
+    }
+}

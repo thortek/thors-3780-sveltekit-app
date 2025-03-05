@@ -50,5 +50,6 @@ export const actions = {
         //const client = locals.mongoClient as MongoClient
         const data = await request.formData()
         console.log(data)
+        return { success: true, message: 'Review submitted' }
     }
 }
